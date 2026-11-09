@@ -1,0 +1,181 @@
+/*
+================================================================================
+PROBLEM 3: STUDENT ENROLLMENT & BOOK ADOPTION DATABASE
+Relations:
+  STUDENT (REGNO: varchar, NAME: varchar, MAJOR: varchar, BDATE: date)
+  COURSE (COURSE: int, CNAME: varchar, DEPT: varchar)
+  ENROLL (REG_NO: varchar, COURSE_: int, SEM: int, MARKS: int)
+  BOOK_ADOPTION (COURSE_: int, SEM: int, BOOK_ISBN: int)
+  TEXT (BOOKISBN: int, BOOKTITLE: varchar, PUBLISHER: varchar, AUTHOR: varchar)
+================================================================================
+*/
+
+CREATE DATABASE IF NOT EXISTS QUESTION3;
+USE QUESTION3;
+
+-- (i) Create the above tables by properly specifying the primary keys and the foreign keys.
+
+CREATE TABLE STUDENT (
+    REGNO VARCHAR(30) PRIMARY KEY,
+    NAME VARCHAR(30) NOT NULL,
+    MAJOR VARCHAR(30) NOT NULL,
+    BDATE DATE NOT NULL
+);
+
+CREATE TABLE COURSE (
+    COURSE INT PRIMARY KEY,
+    CNAME VARCHAR(30) NOT NULL,
+    DEPT VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE ENROLL (
+    REG_NO VARCHAR(30) NOT NULL,
+    COURSE_ INT NOT NULL,
+    SEM INT NOT NULL,
+    MARKS INT NOT NULL,
+    PRIMARY KEY (REG_NO, COURSE_, SEM),
+    FOREIGN KEY (REG_NO) REFERENCES STUDENT(REGNO) ON DELETE CASCADE,
+    FOREIGN KEY (COURSE_) REFERENCES COURSE(COURSE) ON DELETE CASCADE
+);
+
+CREATE TABLE TEXT (
+    BOOKISBN INT PRIMARY KEY,
+    BOOKTITLE VARCHAR(50) NOT NULL,
+    PUBLISHER VARCHAR(30) NOT NULL,
+    AUTHOR VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE BOOK_ADOPTION (
+    COURSE_ INT NOT NULL,
+    SEM INT NOT NULL,
+    BOOK_ISBN INT NOT NULL,
+    PRIMARY KEY (COURSE_, SEM, BOOK_ISBN),
+    FOREIGN KEY (COURSE_) REFERENCES COURSE(COURSE) ON DELETE CASCADE,
+    FOREIGN KEY (BOOK_ISBN) REFERENCES TEXT(BOOKISBN) ON DELETE CASCADE
+);
+
+-- Inspect table structures
+DESCRIBE STUDENT;
+DESCRIBE COURSE;
+DESCRIBE ENROLL;
+DESCRIBE TEXT;
+DESCRIBE BOOK_ADOPTION;
+
+
+-- (ii) Enter at least five tuples for each relation.
+
+-- STUDENT
+INSERT INTO STUDENT (REGNO, NAME, MAJOR, BDATE) VALUES
+    ('1BM02IS012', 'ANSHUMAN ATRI', 'DATABASE', '1984-01-15'),
+    ('1BM02CS012', 'A MNC', 'DMS', '1984-02-25'),
+    ('1BM02TC012', 'TELE TECHNO', 'SSDT', '1984-12-11'),
+    ('1BM02EE012', 'ELCTRA', 'POWER GENERATION', '1984-04-01'),
+    ('1BM02EC012', 'GG', 'POWER ELECTRONICS', '1984-11-05');
+
+SELECT * FROM STUDENT;
+
+-- COURSE
+INSERT INTO COURSE (COURSE, CNAME, DEPT) VALUES
+    (1, 'DATABASE', 'IS'),
+    (2, 'DMS', 'IS'),
+    (3, 'SSDT', 'TC'),
+    (4, 'POWER GENERATION', 'EE'),
+    (5, 'POWER ELECTRONICS', 'EC'),
+    (6, 'ADVANCE MP', 'CS');
+
+SELECT * FROM COURSE;
+
+-- TEXT
+INSERT INTO TEXT (BOOKISBN, BOOKTITLE, PUBLISHER, AUTHOR) VALUES
+    (1, 'DATABASE A SYSTEMATIC APPROACH', 'JOHN WILEY', 'R ASHOK KUMAR'),
+    (2, 'DMS FOR DUMMIES', 'PEARSON', 'MADHUPRIYA'),
+    (3, 'SSDT NO ONE CAN TEACH BETTER', 'PEARSON', 'GAURA'),
+    (4, 'POWER GENERATION BIBLE', 'TMH', 'MEENA'),
+    (5, 'POWER OF POWER ELECTRONICS', 'O REILLY', 'GG THE GREAT');
+
+SELECT * FROM TEXT;
+
+-- ENROLL
+INSERT INTO ENROLL (REG_NO, COURSE_, SEM, MARKS) VALUES
+    ('1BM02IS012', 1, 5, 98),
+    ('1BM02CS012', 2, 3, 88),
+    ('1BM02TC012', 3, 5, 88),
+    ('1BM02EE012', 4, 5, 88),
+    ('1BM02EC012', 5, 5, 88);
+
+SELECT * FROM ENROLL;
+
+-- BOOK_ADOPTION
+INSERT INTO BOOK_ADOPTION (COURSE_, SEM, BOOK_ISBN) VALUES
+    (1, 5, 1),
+    (2, 3, 2),
+    (3, 5, 3),
+    (4, 5, 4),
+    (5, 5, 5);
+
+SELECT * FROM BOOK_ADOPTION;
+
+
+-- (iii) Demonstrate how you add a new text book to the database and make this book be adopted by some department.
+
+-- Step 1: Add new textbooks
+INSERT INTO TEXT (BOOKISBN, BOOKTITLE, PUBLISHER, AUTHOR) VALUES
+    (7, 'DATABASE FOR DUMMIES', 'PEARSON', 'R A K'),
+    (8, 'MP INTEL FAMILY', 'PEARSON', 'BARRY B BREY'),
+    (9, 'MP FOR DUMMIES', 'PEARSON', 'A K ROY'),
+    (10, 'A TO Z OF MP', 'PEARSON', 'BURCHANDI'),
+    (1111, 'MULTIMEDIA', 'PHI', 'NAVATHE');
+
+-- Step 2: Make the books adopted by departments/courses
+INSERT INTO BOOK_ADOPTION (COURSE_, SEM, BOOK_ISBN) VALUES
+    (6, 5, 8),
+    (6, 5, 9),
+    (6, 5, 10);
+
+-- Display updated TEXT and BOOK_ADOPTION tables
+SELECT * FROM TEXT;
+SELECT * FROM BOOK_ADOPTION;
+
+
+-- (iv) Produce a list of text books (include Course #, Book-ISBN, Book-title) in the alphabetical order for courses offered by the ‘CS’ department that use more than 2 books.
+SELECT C.COURSE, T.BOOKISBN, T.BOOKTITLE
+FROM COURSE C, BOOK_ADOPTION BA, TEXT T
+WHERE C.COURSE = BA.COURSE_
+  AND BA.BOOK_ISBN = T.BOOKISBN
+  AND C.DEPT = 'CS'
+  AND (
+      SELECT COUNT(COURSE_)
+      FROM BOOK_ADOPTION
+      WHERE COURSE_ = C.COURSE
+  ) > 2
+ORDER BY T.BOOKTITLE;
+
+
+-- (v) List any department that has all its adopted books published by a specific publisher.
+SELECT DISTINCT C.DEPT, T.PUBLISHER
+FROM COURSE C, TEXT T, BOOK_ADOPTION BA
+WHERE C.COURSE = BA.COURSE_
+  AND T.BOOKISBN = BA.BOOK_ISBN
+  AND T.PUBLISHER = ALL (
+      SELECT T1.PUBLISHER
+      FROM COURSE C1, BOOK_ADOPTION BA1, TEXT T1
+      WHERE BA1.BOOK_ISBN = T1.BOOKISBN
+        AND BA1.COURSE_ = C1.COURSE
+        AND C.DEPT = C1.DEPT
+  );
+
+
+-- (vi) Generation of suitable reports.
+
+-- Report 1: Number of students enrolled in each course
+SELECT C.COURSE, COUNT(E.REG_NO) AS NO_OF_STUDENTS
+FROM COURSE C, ENROLL E
+WHERE C.COURSE = E.COURSE_
+GROUP BY C.COURSE;
+
+-- Report 2: Name and registration number of students enrolled in a specific course (e.g., Course #1)
+SELECT S.REGNO, S.NAME, C.CNAME
+FROM STUDENT S, ENROLL E, COURSE C
+WHERE S.REGNO = E.REG_NO
+  AND E.COURSE_ = C.COURSE
+  AND C.COURSE = 1;
