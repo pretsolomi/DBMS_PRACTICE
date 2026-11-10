@@ -72,7 +72,7 @@ DESCRIBE SHIPMENT;
 
 -- CUSTOMER
 INSERT INTO CUSTOMER (CID, CNAME, CITY) VALUES 
-    (100, 'A', 'BAN'),
+    (100, 'A', 'BAN'), --LOMI
     (200, 'B', 'MAD'),
     (300, 'C', 'DEL'),
     (400, 'D', 'LUC'),
