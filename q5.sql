@@ -162,6 +162,8 @@ HAVING COUNT(DISTINCT b.branch_name) = (
     WHERE branch_city = 'Bangalore'
 );
 
+-- all my answers here: 
+--https://github.com/pretsolomi/DBMS_PRACTICE
 
 -- (v) Demonstrate how you delete tuples in ACCOUNT relation at every branch located in a specific city.
 DELETE FROM ACCOUNT
