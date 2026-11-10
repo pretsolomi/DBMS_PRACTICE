@@ -7,6 +7,9 @@ Relations:
   ENROLL (REG_NO: varchar, COURSE_: int, SEM: int, MARKS: int)
   BOOK_ADOPTION (COURSE_: int, SEM: int, BOOK_ISBN: int)
   TEXT (BOOKISBN: int, BOOKTITLE: varchar, PUBLISHER: varchar, AUTHOR: varchar)
+-- all my answers here: 
+--https://github.com/pretsolomi/DBMS_PRACTICE
+
 ================================================================================
 */
 
