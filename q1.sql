@@ -143,5 +143,8 @@ WHERE P.DRIVER_ID = PA.DRIVER_ID
   AND C.REG_NO = PA.REG_NO 
   AND A.REPORT_NO = PA.REPORT_NO;
 
+-- all my answers here: 
+--https://github.com/pretsolomi/DBMS_PRACTICE
+
 
 
