@@ -8,6 +8,9 @@ Relations:
   ORDER_ITEM (ONO: int, INO: int, QTY: int)
   WAREHOUSE (WARENO: int, CITY: varchar)
   SHIPMENT (ONO: int, WARENO: int, SHIPDATE: date)
+-- all my answers here: 
+--https://github.com/pretsolomi/DBMS_PRACTICE
+
 ================================================================================
 */
 
